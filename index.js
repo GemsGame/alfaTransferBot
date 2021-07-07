@@ -27,24 +27,22 @@ const getAlfaRates = () => {
 const getPrice = (time, msg) => {
   bot.sendMessage(msg.chat.id, "Bonjour");
   timer = setInterval(() => {
-    getAlfaRates().then((alfa) => {
-      getNationalRates().then((n) => {
-        const dollarAlfa = alfa.find((i) => i.name === "доллар США");
-        let advice;
-        if (dollarAlfa.buyRate > n.rate) {
-          advice = "-> трансфер по нацбанку";
-        } else {
-          advice = "-> по курсу банка";
-        }
-        bot.sendMessage(
-          msg.chat.id,
-          `НацБанк: ${n.rate}, ${n.date} \n` +
+    Promise.all([getAlfaRates(), getNationalRates()]).then((values) => {
+      const dollarAlfa = values[0].find((i) => i.name === "доллар США");
+      let advice;
+      if (dollarAlfa.buyRate > values[1].rate) {
+        advice = "-> трансфер по нацбанку";
+      } else {
+        advice = "-> по курсу банка";
+      }
+      bot.sendMessage(
+        msg.chat.id,
+        `НацБанк: ${values[1].rate}, ${values[1].date} \n` +
           `Альфа: ${dollarAlfa.buyRate}, ${dollarAlfa.date} \n ${advice}`
-        );
-      });
+      );
     });
   }, time);
-}
+};
 bot.onText(/\/watch_every_5s/, (msg) => {
   getPrice(5000, msg);
 });
