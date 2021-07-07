@@ -29,7 +29,6 @@ const getPrice = (time, msg) => {
   timer = setInterval(() => {
     getAlfaRates().then((alfa) => {
       getNationalRates().then((n) => {
-        console.log(alfa);
         const dollarAlfa = alfa.find((i) => i.name === "доллар США");
         let advice;
         if (dollarAlfa.buyRate > n.rate) {
